@@ -1,27 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import stripe from '@/utils/stripe';
 
+
+
 export async function POST(req: NextRequest) {
   try {
-    const { productId, priceTier } = await req.json();
-
+    const { productId, price } = await req.json();
     
-    let unitAmount;
-    switch (priceTier) {
-      case "tier_10":
-        unitAmount = 1000; 
-        break;
-      case "tier_15":
-        unitAmount = 1500; 
-        break;
-      case "tier_20":
-        unitAmount = 2000; 
-        break;
-      default:
-        unitAmount = 2000; 
-        break;
-    }
-
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -31,7 +16,7 @@ export async function POST(req: NextRequest) {
             product_data: {
               name: `Product ${productId}`,
             },
-            unit_amount: unitAmount,
+            unit_amount: price,
           },
           quantity: 1,
         },
